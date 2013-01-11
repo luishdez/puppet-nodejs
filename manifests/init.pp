@@ -281,22 +281,26 @@ class nodejs (
   file { 'nodejs-source-dir':
     ensure  => directory,
     path    => $nodejs::package_source_path,
+    unless  => "node -v",
   }
 
   exec { 'nodejs-source-download':
     command => "wget -O $nodejs::package_source_path/$nodejs::package_source_file $nodejs::package_source",
     require => File['nodejs-source-dir'],
+    unless  => "node -v",
   }
 
   exec { 'nodejs-source-decompress':
     command => "tar -zxvf $nodejs::package_source_path/$nodejs::package_source_file -C $nodejs::package_source_path",
     require => Exec['nodejs-source-download'],
+    unless => "node -v",
   }
 
   exec { 'nodejs-source-build':
     command => "make && make install",
     cwd     => "$nodejs::package_source_path/node-$nodejs::version",
-    require => Exec['nodejs-source-decompress'],    
+    require => Exec['nodejs-source-decompress'],
+    unless  => "node -v",
   }
 
   file { 'nodejs.conf':

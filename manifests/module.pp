@@ -3,11 +3,18 @@
 #
 define nodejs::module (
   $ensure = 'present',
-  $provider = $nodejs::module_provider,
   ) {
 
-  package { $name:
-    ensure => $ensure,
-    provider => $provider,
+  if $ensure == 'absent' {
+    exec { "nodejs-module-$name":
+      command => "npm -g remove $name",
+      require => Exec['nodejs-source-build'],
+    }
+  } else {
+    exec { "nodejs-module-$name":
+      command => "npm -g install $name",
+      require => Exec['nodejs-source-build'],
+    }
   }
+
 }
